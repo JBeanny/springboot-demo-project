@@ -93,6 +93,6 @@ public class ProductService {
         List<Product> product = productRepository.findProductsWithFilters(formattedName);
         
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","successfully retrieved products",product));
+                .body(new BaseResponseWithDataModel("success","successfully retrieved products with filters",product));
     }
 }
