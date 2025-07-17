@@ -26,9 +26,11 @@ public class ProductController {
     
     @GetMapping("/search")
     public ResponseEntity<BaseResponseWithDataModel> searchProductsByFilters(
-            @RequestParam(value = "name", required = false) String name
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice
     ) {
-        return productService.searchProducts(name);
+        return productService.searchProducts(name,minPrice,maxPrice);
     }
     
     @PostMapping
