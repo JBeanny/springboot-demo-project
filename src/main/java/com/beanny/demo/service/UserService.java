@@ -68,12 +68,7 @@ public class UserService {
         
         // modify values
         User updatedUser = existing.get();
-        
-        updatedUser.setEmail(payload.getEmail());
-        updatedUser.setName(payload.getName());
-        updatedUser.setAge(payload.getAge());
-        updatedUser.setAddress(payload.getAddress());
-        updatedUser.setRole(payload.getRole());
+        mapper.updateEntityFromDto(updatedUser,payload);
         
         userRepository.save(updatedUser);
         
