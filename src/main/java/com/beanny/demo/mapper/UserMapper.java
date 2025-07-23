@@ -5,7 +5,6 @@ import com.beanny.demo.dto.UserResponseDto;
 import com.beanny.demo.entity.User;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ public class UserMapper {
         entity.setRole(dto.getRole());
         entity.setAddress(dto.getAddress());
         entity.setEmail(dto.getEmail());
-        entity.setCreatedAt(LocalDateTime.now());
         
         return entity;
     }
@@ -48,6 +46,8 @@ public class UserMapper {
         dto.setAge(entity.getAge());
         dto.setAddress(entity.getAddress());
         dto.setRole(entity.getRole());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
         
         return dto;
     }
