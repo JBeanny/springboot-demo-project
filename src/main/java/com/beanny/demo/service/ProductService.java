@@ -1,16 +1,16 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.entity.Product;
+import com.beanny.demo.mapper.ProductMapper;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
-import com.beanny.demo.model.ProductModel;
 import com.beanny.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,11 +19,14 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     
+    @Autowired
+    private ProductMapper mapper;
+    
     public ResponseEntity<BaseResponseWithDataModel> listProducts() {
         List<Product> products = productRepository.findAll();
         
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","successfully retrieved products",products));
+                .body(new BaseResponseWithDataModel("success","successfully retrieved products",mapper.toDtoList(products)));
     }
     
     public ResponseEntity<BaseResponseWithDataModel> getProduct(Long productId) {
@@ -38,13 +41,14 @@ public class ProductService {
                 .body(new BaseResponseWithDataModel("success","product found",product.get()));
     }
     
-    public ResponseEntity<BaseResponseModel> createProduct(ProductModel product) {
-        Product productEntity = new Product();
+    public ResponseEntity<BaseResponseModel> createProduct(ProductDto product) {
+        // validate if product is already existed
+        if(productRepository.existsByProductName(product.getName())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new BaseResponseModel("fail","product is already existed"));
+        }
         
-        productEntity.setProductName(product.getName());
-        productEntity.setDescription(product.getDescription());
-        productEntity.setPrice(product.getPrice());
-        productEntity.setCreatedAt(LocalDateTime.now());
+        Product productEntity = mapper.toEntity(product);
         
         productRepository.save(productEntity);
         
@@ -52,7 +56,7 @@ public class ProductService {
                 .body(new BaseResponseModel("success","successfully created product"));
     }
     
-    public ResponseEntity<BaseResponseModel> updateProduct(Long productId,ProductModel product) {
+    public ResponseEntity<BaseResponseModel> updateProduct(Long productId,ProductDto product) {
         Optional<Product> existing = productRepository.findById(productId);
         
         if(existing.isEmpty()) {
@@ -65,7 +69,6 @@ public class ProductService {
         updatedProduct.setProductName(product.getName());
         updatedProduct.setDescription(product.getDescription());
         updatedProduct.setPrice(product.getPrice());
-        updatedProduct.setUpdatedAt(LocalDateTime.now());
         
         productRepository.save(updatedProduct);
         

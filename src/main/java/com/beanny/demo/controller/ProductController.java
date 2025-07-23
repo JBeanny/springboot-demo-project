@@ -1,8 +1,8 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
-import com.beanny.demo.model.ProductModel;
 import com.beanny.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +34,12 @@ public class ProductController {
     }
     
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createProduct(@RequestBody ProductModel payload) {
+    public ResponseEntity<BaseResponseModel> createProduct(@RequestBody ProductDto payload) {
         return productService.createProduct(payload);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<BaseResponseModel> updateProduct(@PathVariable("id") Long productId,@RequestBody ProductModel payload) {
+    public ResponseEntity<BaseResponseModel> updateProduct(@PathVariable("id") Long productId,@RequestBody ProductDto payload) {
         return productService.updateProduct(productId,payload);
     }
     
