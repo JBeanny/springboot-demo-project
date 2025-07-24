@@ -1,9 +1,9 @@
-package com.beanny.demo.model.stock;
+package com.beanny.demo.dto.stock;
 
 import lombok.Data;
 
 @Data
-public class StockModel {
+public class StockDto {
     private Long productId;
     private Integer quantity;
 }
