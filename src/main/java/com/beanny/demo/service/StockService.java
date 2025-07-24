@@ -6,6 +6,7 @@ import com.beanny.demo.mapper.StockMapper;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.stock.UpdateStockDto;
+import com.beanny.demo.repository.ProductRepository;
 import com.beanny.demo.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,9 @@ import java.util.Optional;
 public class StockService {
     @Autowired
     private StockRepository stockRepository;
+    
+    @Autowired
+    private ProductRepository productRepository;
     
     @Autowired
     private StockMapper mapper;
@@ -43,6 +47,12 @@ public class StockService {
     }
     
     public ResponseEntity<BaseResponseModel> createStock(StockDto stock) {
+        // product not found
+        if(!productRepository.existsById(stock.getProductId())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new BaseResponseModel("fail","product not found: " + stock.getProductId()));
+        }
+        
         Stock stockEntity = mapper.toEntity(stock);
         
         stockRepository.save(stockEntity);
