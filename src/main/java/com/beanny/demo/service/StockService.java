@@ -1,6 +1,7 @@
 package com.beanny.demo.service;
 
 import com.beanny.demo.dto.stock.StockDto;
+import com.beanny.demo.entity.Product;
 import com.beanny.demo.entity.Stock;
 import com.beanny.demo.mapper.StockMapper;
 import com.beanny.demo.model.BaseResponseModel;
@@ -47,13 +48,15 @@ public class StockService {
     }
     
     public ResponseEntity<BaseResponseModel> createStock(StockDto stock) {
+        Optional<Product> existingProduct = productRepository.findById(stock.getProductId());
+        
         // product not found
-        if(!productRepository.existsById(stock.getProductId())) {
+        if(existingProduct.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new BaseResponseModel("fail","product not found: " + stock.getProductId()));
         }
         
-        Stock stockEntity = mapper.toEntity(stock);
+        Stock stockEntity = mapper.toEntity(stock,existingProduct.get());
         
         stockRepository.save(stockEntity);
         

@@ -2,6 +2,7 @@ package com.beanny.demo.mapper;
 
 import com.beanny.demo.dto.stock.StockDto;
 import com.beanny.demo.dto.stock.StockResponseDto;
+import com.beanny.demo.entity.Product;
 import com.beanny.demo.entity.Stock;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +13,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class StockMapper {
-    public Stock toEntity(StockDto dto) {
+    public Stock toEntity(StockDto dto, Product product) {
         Stock entity = new Stock();
         
         entity.setQuantity(dto.getQuantity());
-        entity.setProductId(dto.getProductId());
+        entity.setProduct(product);
         
         return entity;
     }
@@ -25,7 +26,7 @@ public class StockMapper {
         StockResponseDto dto = new StockResponseDto();
         
         dto.setId(entity.getId());
-        dto.setProductId(entity.getProductId());
+        dto.setProductId(entity.getProduct().getId());
         dto.setQty(entity.getQuantity());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
