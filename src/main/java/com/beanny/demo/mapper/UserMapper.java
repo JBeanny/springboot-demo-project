@@ -1,7 +1,7 @@
 package com.beanny.demo.mapper;
 
-import com.beanny.demo.dto.UserDto;
-import com.beanny.demo.dto.UserResponseDto;
+import com.beanny.demo.dto.user.UserDto;
+import com.beanny.demo.dto.user.UserResponseDto;
 import com.beanny.demo.entity.User;
 import org.springframework.stereotype.Component;
 

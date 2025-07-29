@@ -2,7 +2,7 @@ package com.beanny.demo.controller;
 
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
-import com.beanny.demo.dto.UserDto;
+import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

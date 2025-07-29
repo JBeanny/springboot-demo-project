@@ -1,4 +1,4 @@
-package com.beanny.demo.dto;
+package com.beanny.demo.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
