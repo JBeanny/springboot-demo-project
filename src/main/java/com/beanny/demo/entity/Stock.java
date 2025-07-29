@@ -25,6 +25,10 @@ public class Stock {
     @JoinColumn(name = "product_id")
     private Product product;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
+    
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
