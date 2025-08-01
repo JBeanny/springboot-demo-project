@@ -3,6 +3,8 @@ package com.beanny.demo.service;
 import com.beanny.demo.dto.supplier.SupplierDto;
 import com.beanny.demo.dto.supplier.UpdateSupplierDto;
 import com.beanny.demo.entity.Supplier;
+import com.beanny.demo.exception.model.DuplicateResourceException;
+import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.mapper.SupplierMapper;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
@@ -39,8 +41,7 @@ public class SupplierService {
     public ResponseEntity<BaseResponseModel> createSupplier(SupplierDto dto) {
         // if duplicate supplier name , then reject
         if(supplierRepository.existsByName(dto.getName())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new BaseResponseModel("fail","supplier already existed with name: " + dto.getName()));
+            throw new DuplicateResourceException("supplier already existed with name: " + dto.getName());
         }
         
         Supplier supplier = mapper.toEntity(dto);
@@ -52,18 +53,12 @@ public class SupplierService {
     }
     
     public ResponseEntity<BaseResponseModel> updateSupplier(Long supplierId, UpdateSupplierDto dto) {
-        Optional<Supplier> existingSupplier = supplierRepository.findById(supplierId);
+        Supplier existingSupplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new ResourceNotFoundException("supplier not found with id: " + supplierId));
         
-        // if supplier not found, return 404
-        if(existingSupplier.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponseModel("fail","supplier not found with id: " + supplierId));
-        }
+        mapper.updateEntityFromDto(existingSupplier,dto);
         
-        Supplier supplier = existingSupplier.get();
-        mapper.updateEntityFromDto(supplier,dto);
-        
-        supplierRepository.save(supplier);
+        supplierRepository.save(existingSupplier);
         
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BaseResponseModel("success","successfully updated supplier"));
@@ -71,8 +66,7 @@ public class SupplierService {
     
     public ResponseEntity<BaseResponseModel> deleteSupplier(Long supplierId) {
         if(!supplierRepository.existsById(supplierId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new BaseResponseModel("fail","supplier not found with id: " + supplierId));
+            throw new ResourceNotFoundException("supplier not found with id: " + supplierId);
         }
         
         supplierRepository.deleteById(supplierId);
