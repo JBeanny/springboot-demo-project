@@ -4,6 +4,7 @@ import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class ProductController {
     }
     
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createProduct(@RequestBody ProductDto payload) {
+    public ResponseEntity<BaseResponseModel> createProduct(@Valid @RequestBody ProductDto payload) {
         return productService.createProduct(payload);
     }
     
