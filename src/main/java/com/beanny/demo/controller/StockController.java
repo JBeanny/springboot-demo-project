@@ -5,6 +5,7 @@ import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.stock.UpdateStockDto;
 import com.beanny.demo.service.StockService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,12 @@ public class StockController {
     }
     
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createStock(@RequestBody StockDto payload) {
+    public ResponseEntity<BaseResponseModel> createStock(@Valid @RequestBody StockDto payload) {
         return stockService.createStock(payload);
     }
     
     @PatchMapping("{id}")
-    public ResponseEntity<BaseResponseModel> adjustQuantity(@PathVariable("id") Long stockId,@RequestBody UpdateStockDto payload) {
+    public ResponseEntity<BaseResponseModel> adjustQuantity(@PathVariable("id") Long stockId,@Valid @RequestBody UpdateStockDto payload) {
         return stockService.adjustQuantity(stockId,payload);
     }
     
