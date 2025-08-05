@@ -5,6 +5,7 @@ import com.beanny.demo.dto.supplier.UpdateSupplierDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.service.SupplierService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +22,14 @@ public class SupplierController {
     }
     
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createSupplier(@RequestBody SupplierDto payload) {
+    public ResponseEntity<BaseResponseModel> createSupplier(@Valid @RequestBody SupplierDto payload) {
         return supplierService.createSupplier(payload);
     }
     
     @PutMapping("{supplier_id}")
     public ResponseEntity<BaseResponseModel> updateSupplier(
                 @PathVariable("supplier_id") Long supplierId,
-                @RequestBody UpdateSupplierDto payload
+                @Valid @RequestBody UpdateSupplierDto payload
             ) {
         return supplierService.updateSupplier(supplierId,payload);
     }
