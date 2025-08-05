@@ -4,6 +4,7 @@ import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class UserController {
     // used for creating/inserting record
     // request body can be called request payload or shortcut "payload"
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createUser(@RequestBody UserDto payload) {
+    public ResponseEntity<BaseResponseModel> createUser(@Valid @RequestBody UserDto payload) {
         return userService.createUser(payload);
     }
     
     //  endpoint -> /api/v1/users/923482348284
     @PutMapping("/{user_id}")
-    public ResponseEntity<BaseResponseModel> updateUser(@PathVariable("user_id") Long userId, @RequestBody UserDto payload) {
+    public ResponseEntity<BaseResponseModel> updateUser(@PathVariable("user_id") Long userId,@Valid @RequestBody UserDto payload) {
         return userService.updateUser(payload,userId);
     }
     
