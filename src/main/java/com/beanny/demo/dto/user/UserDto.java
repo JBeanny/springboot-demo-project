@@ -1,5 +1,7 @@
 package com.beanny.demo.dto.user;
 
+import com.beanny.demo.common.annotations.ValidEnum;
+import com.beanny.demo.common.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -30,5 +32,6 @@ public class UserDto {
     @Email(message = "email must be valid")
     private String email;
     
+    @ValidEnum(enumClass = Role.class, message = "Role must be in [USER,ADMIN]")
     private String role = "USER";
 }
