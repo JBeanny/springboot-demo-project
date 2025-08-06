@@ -1,5 +1,6 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.user.UserDto;
@@ -35,7 +36,7 @@ public class UserController {
     
     //  endpoint -> /api/v1/users/923482348284
     @PutMapping("/{user_id}")
-    public ResponseEntity<BaseResponseModel> updateUser(@PathVariable("user_id") Long userId,@Valid @RequestBody UserDto payload) {
+    public ResponseEntity<BaseResponseModel> updateUser(@PathVariable("user_id") Long userId,@Valid @RequestBody UpdateUserDto payload) {
         return userService.updateUser(payload,userId);
     }
     

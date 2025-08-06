@@ -1,5 +1,6 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.dto.user.UserResponseDto;
 import com.beanny.demo.entity.User;
 import com.beanny.demo.exception.model.DuplicateResourceException;
@@ -64,7 +65,7 @@ public class UserService {
                 .body(new BaseResponseModel("success","successfully created user"));
     }
     
-    public ResponseEntity<BaseResponseModel> updateUser(UserDto payload, Long userId) {
+    public ResponseEntity<BaseResponseModel> updateUser(UpdateUserDto payload, Long userId) {
         User existing = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("user not found with id: " + userId));
         
