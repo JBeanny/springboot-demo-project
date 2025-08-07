@@ -1,5 +1,6 @@
 package com.beanny.demo.mapper;
 
+import com.beanny.demo.dto.user.ChangePasswordUserDto;
 import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.dto.user.UserResponseDto;
@@ -60,5 +61,9 @@ public class UserMapper {
         return entities.stream()
                 .map(user -> this.toDto(user))
                 .collect(Collectors.toList());
+    }
+    
+    public void updateEntityChangePassword(User entity, String password) {
+        entity.setPassword(password);
     }
 }

@@ -1,5 +1,6 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.user.ChangePasswordUserDto;
 import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
@@ -44,5 +45,11 @@ public class UserController {
     @DeleteMapping("/{user_id}")
     public ResponseEntity<BaseResponseModel> deleteUser(@PathVariable("user_id") Long userId) {
         return userService.deleteUser(userId);
+    }
+    
+    // change password
+    @PatchMapping("/{user_id}/change-password")
+    public ResponseEntity<BaseResponseModel> changePassword(@PathVariable("user_id") Long userId,@RequestBody ChangePasswordUserDto payload) {
+        return userService.changePassword(payload, userId);
     }
 }
