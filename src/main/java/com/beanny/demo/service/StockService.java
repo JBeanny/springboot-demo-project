@@ -41,7 +41,7 @@ public class StockService {
                 .orElseThrow(() -> new ResourceNotFoundException("stock not found with id: " + stockId));
         
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","stock found",stock));
+                .body(new BaseResponseWithDataModel("success","stock found",mapper.toDto(stock)));
     }
     
     public ResponseEntity<BaseResponseModel> createStock(StockDto stock) {
