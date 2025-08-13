@@ -6,6 +6,7 @@ import com.beanny.demo.entity.Order;
 import com.beanny.demo.entity.Stock;
 import com.beanny.demo.mapper.OrderMapper;
 import com.beanny.demo.model.BaseResponseModel;
+import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.repository.OrderRepository;
 import com.beanny.demo.repository.StockRepository;
 import jakarta.transaction.Transactional;
@@ -30,6 +31,13 @@ public class OrderService {
     
     @Autowired
     private StockRepository stockRepository;
+    
+    public ResponseEntity<BaseResponseWithDataModel> listOrders() {
+        List<Order> orders = orderRepository.findAll();
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new BaseResponseWithDataModel("success","successfully retrieved orders",mapper.toResponseDtoList(orders)));
+    }
     
     @Transactional
     public ResponseEntity<BaseResponseModel> createOrder(OrderDto payload) {
