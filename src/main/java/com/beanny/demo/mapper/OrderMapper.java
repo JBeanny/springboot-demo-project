@@ -3,6 +3,7 @@ package com.beanny.demo.mapper;
 import com.beanny.demo.dto.order.OrderDto;
 import com.beanny.demo.dto.order.OrderItemResponseDto;
 import com.beanny.demo.dto.order.OrderResponseDto;
+import com.beanny.demo.dto.order.OrderUpdateDto;
 import com.beanny.demo.entity.Order;
 import com.beanny.demo.entity.OrderItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,12 @@ public class OrderMapper {
         return entities.stream()
                 .map(order -> this.toResponseDto(order))
                 .toList();
+    }
+    
+    public void updateEntityFromDto(Order entity, OrderUpdateDto dto) {
+        if(entity == null || dto == null) return;
+        
+        entity.setStatus(dto.getStatus());
     }
     
 }
