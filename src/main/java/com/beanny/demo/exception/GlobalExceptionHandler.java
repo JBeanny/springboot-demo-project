@@ -2,6 +2,7 @@ package com.beanny.demo.exception;
 
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
+import com.beanny.demo.exception.model.UnprocessableEntityException;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponseModel> handleDuplicateResourceException(DuplicateResourceException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new BaseResponseModel("fail",ex.getMessage()));
+    }
+    
+    @ExceptionHandler(UnprocessableEntityException.class)
+    public ResponseEntity<BaseResponseModel> handleUnprocessableEntity(UnprocessableEntityException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new BaseResponseModel("fail", ex.getMessage()));
     }
     
     @ExceptionHandler(Exception.class)

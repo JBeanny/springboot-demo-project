@@ -6,6 +6,7 @@ import com.beanny.demo.dto.order.OrderUpdateDto;
 import com.beanny.demo.entity.Order;
 import com.beanny.demo.entity.Stock;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
+import com.beanny.demo.exception.model.UnprocessableEntityException;
 import com.beanny.demo.mapper.OrderMapper;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
@@ -84,7 +85,7 @@ public class OrderService {
             
             // not enough qty for sale
             if(remain > 0) {
-                throw new RuntimeException("Not enough stock for product id: " + productId);
+                throw new UnprocessableEntityException("Not enough stock for product id: " + productId);
             }
         }
         
