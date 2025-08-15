@@ -1,11 +1,12 @@
 package com.beanny.demo.exception;
 
+import com.beanny.demo.common.ResponseWrapper;
+import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.exception.model.UnprocessableEntityException;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,46 +16,50 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler that catches exceptions across the application
+ * and converts them to standardized API responses using the Response wrapper.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<BaseResponseModel> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new BaseResponseModel("fail",ex.getMessage()));
+    public ResponseEntity<Response<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        logger.warn("Resource not found: {}", ex.getMessage());
+        return ResponseWrapper.notFound(ex.getMessage());
     }
     
     @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<BaseResponseModel> handleDuplicateResourceException(DuplicateResourceException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new BaseResponseModel("fail",ex.getMessage()));
+    public ResponseEntity<Response<Void>> handleDuplicateResourceException(DuplicateResourceException ex) {
+        logger.warn("Duplicate resource: {}", ex.getMessage());
+        return ResponseWrapper.conflict(ex.getMessage());
     }
     
     @ExceptionHandler(UnprocessableEntityException.class)
-    public ResponseEntity<BaseResponseModel> handleUnprocessableEntity(UnprocessableEntityException ex) {
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(new BaseResponseModel("fail", ex.getMessage()));
+    public ResponseEntity<Response<Void>> handleUnprocessableEntity(UnprocessableEntityException ex) {
+        logger.warn("Unprocessable entity: {}", ex.getMessage());
+        return ResponseWrapper.unprocessableEntity(ex.getMessage());
     }
     
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponseModel> handleGenericException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new BaseResponseModel("fail","unexpected error occured: " + ex.getMessage()));
+    public ResponseEntity<Response<Void>> handleGenericException(Exception ex) {
+        logger.error("Unexpected error occurred", ex);
+        return ResponseWrapper.internalServerError("An unexpected error occurred: " + ex.getMessage());
     }
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<BaseResponseWithDataModel> handleValidationException(MethodArgumentNotValidException ex) {
-        Map<String,String> errors = new HashMap();
+    public ResponseEntity<Response<Map<String, String>>> handleValidationException(MethodArgumentNotValidException ex) {
+        logger.warn("Validation failed: {}", ex.getMessage());
         
+        Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String message = error.getDefaultMessage();
-            
-            // insert into errors map
-            errors.put(fieldName,message);
+            errors.put(fieldName, message);
         });
         
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new BaseResponseWithDataModel("fail","validation failed",errors));
+        return ResponseWrapper.badRequest("Validation failed", errors);
     }
 }

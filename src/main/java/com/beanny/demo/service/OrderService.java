@@ -1,31 +1,25 @@
 package com.beanny.demo.service;
 
 import com.beanny.demo.dto.order.OrderDto;
-import com.beanny.demo.dto.order.OrderItemDto;
+import com.beanny.demo.dto.order.OrderResponseDto;
 import com.beanny.demo.dto.order.OrderUpdateDto;
 import com.beanny.demo.entity.Order;
-import com.beanny.demo.entity.Stock;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
-import com.beanny.demo.exception.model.UnprocessableEntityException;
 import com.beanny.demo.mapper.OrderMapper;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.repository.OrderRepository;
-import com.beanny.demo.repository.StockRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * Service responsible for order management business logic.
+ * This service focuses purely on business operations and delegates cross-service concerns appropriately.
+ */
 @Service
 public class OrderService {
+    
     @Autowired
     private OrderMapper mapper;
     
@@ -33,95 +27,95 @@ public class OrderService {
     private OrderRepository orderRepository;
     
     @Autowired
-    private StockRepository stockRepository;
+    private StockManagementService stockManagementService;
     
-    public ResponseEntity<BaseResponseWithDataModel> listOrders() {
+    /**
+     * Retrieves all orders from the system.
+     *
+     * @return List of order response DTOs
+     */
+    public List<OrderResponseDto> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","successfully retrieved orders",mapper.toResponseDtoList(orders)));
+        return mapper.toResponseDtoList(orders);
     }
     
+    /**
+     * Retrieves a specific order by ID.
+     *
+     * @param orderId The order ID to retrieve
+     * @return Order response DTO
+     * @throws ResourceNotFoundException if order is not found
+     */
+    public OrderResponseDto getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+        return mapper.toResponseDto(order);
+    }
+    
+    /**
+     * Creates a new order after validating and reserving stock.
+     *
+     * @param orderDto Order creation request
+     * @return Created order response DTO
+     */
     @Transactional
-    public ResponseEntity<BaseResponseModel> createOrder(OrderDto payload) {
-        // map for product ids
-        List<Long> productIds = payload.getOrderItems().stream()
-                .map(OrderItemDto::getProductId)
-                .toList();
-        
-        // get stocks in productIds
-        List<Stock> stocks = stockRepository.findByProductIdIn(productIds, Sort.by(Sort.Direction.ASC, "createdAt"));
-        
-        // map for required quantity of productIds
-        // example: 1: 100, 2: 50
-        Map<Long,Integer> requiredQuantities = payload.getOrderItems().stream()
-                .collect(Collectors.toMap(OrderItemDto::getProductId,OrderItemDto::getAmount));
-        
-        // deduct stock for each product
-        // [1,3]
-        for(Long productId : requiredQuantities.keySet()) {
-            // quantity to deduct
-            int remain = requiredQuantities.get(productId);
-            
-            // filter stocks by product id
-            List<Stock> stocksByProduct = stocks.stream()
-                    .filter(stock -> stock.getProduct().getId().equals(productId))
-                    .toList();
-            
-            // calculate and compare qty
-            for(Stock stock : stocksByProduct) {
-                if(remain <= 0) break;
-                
-                int available = stock.getQuantity();
-                
-                if(available >= remain) {
-                    stock.setQuantity(available - remain);
-                    remain = 0;
-                } else {
-                    stock.setQuantity(0);
-                    remain -= available;
-                }
-            }
-            
-            // not enough qty for sale
-            if(remain > 0) {
-                throw new UnprocessableEntityException("Not enough stock for product id: " + productId);
-            }
+    public OrderResponseDto createOrder(OrderDto orderDto) {
+        // Validate stock availability first
+        if (!stockManagementService.validateStockAvailability(orderDto.getOrderItems())) {
+            throw new ResourceNotFoundException("Insufficient stock for one or more items in the order");
         }
         
-        // save updated stocks to DB
-        stockRepository.saveAll(stocks);
+        // Reserve stock for the order
+        stockManagementService.reserveStockForOrder(orderDto.getOrderItems());
         
-        // create order entity
-        Order order = mapper.toEntity(payload);
-
-        orderRepository.save(order);
+        // Create and save the order
+        Order order = mapper.toEntity(orderDto);
+        Order savedOrder = orderRepository.save(order);
         
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new BaseResponseModel("success","successfully placed order"));
+        return mapper.toResponseDto(savedOrder);
     }
     
-    public ResponseEntity<BaseResponseModel> updateOrderStatus(Long orderId, OrderUpdateDto payload) {
+    /**
+     * Updates the status of an existing order.
+     *
+     * @param orderId Order ID to update
+     * @param updateDto Update request containing new status
+     * @return Updated order response DTO
+     * @throws ResourceNotFoundException if order is not found
+     */
+    @Transactional
+    public OrderResponseDto updateOrderStatus(Long orderId, OrderUpdateDto updateDto) {
         Order existingOrder = orderRepository.findById(orderId)
-                .orElseThrow(() -> {
-                    throw new ResourceNotFoundException("order not found with id: " + orderId);
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
         
-        mapper.updateEntityFromDto(existingOrder,payload);
-        orderRepository.save(existingOrder);
+        mapper.updateEntityFromDto(existingOrder, updateDto);
+        Order updatedOrder = orderRepository.save(existingOrder);
         
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseModel("success","successfully updated order status: " + payload.getStatus()));
+        return mapper.toResponseDto(updatedOrder);
     }
     
-    public ResponseEntity<BaseResponseModel> deleteOrder(Long orderId) {
-        if(!orderRepository.existsById(orderId)) {
-            throw new ResourceNotFoundException("order not found with id: " + orderId);
+    /**
+     * Deletes an order by ID.
+     *
+     * @param orderId Order ID to delete
+     * @throws ResourceNotFoundException if order is not found
+     */
+    @Transactional
+    public void deleteOrder(Long orderId) {
+        if (!orderRepository.existsById(orderId)) {
+            throw new ResourceNotFoundException("Order not found with id: " + orderId);
         }
         
         orderRepository.deleteById(orderId);
-        
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseModel("success","successfully deleted order: " + orderId));
+    }
+    
+    /**
+     * Checks if an order exists.
+     *
+     * @param orderId Order ID to check
+     * @return true if order exists, false otherwise
+     */
+    public boolean orderExists(Long orderId) {
+        return orderRepository.existsById(orderId);
     }
 }
