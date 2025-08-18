@@ -1,6 +1,7 @@
 package com.beanny.demo.service;
 
 import com.beanny.demo.dto.product.ProductDto;
+import com.beanny.demo.dto.product.ProductResponseDto;
 import com.beanny.demo.entity.Product;
 import com.beanny.demo.mapper.ProductMapper;
 import com.beanny.demo.model.BaseResponseModel;
@@ -23,22 +24,20 @@ public class ProductService {
     @Autowired
     private ProductMapper mapper;
     
-    public ResponseEntity<BaseResponseWithDataModel> listProducts() {
+    public List<ProductResponseDto> listProducts() {
         List<Product> products = productRepository.findAll();
         
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","successfully retrieved products",mapper.toDtoList(products)));
+        return mapper.toDtoList(products);
     }
     
-    public ResponseEntity<BaseResponseWithDataModel> getProduct(Long productId) {
+    public ProductResponseDto getProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("product not found with id : " + productId));
         
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","product found",product));
+        return mapper.toDto(product);
     }
     
-    public ResponseEntity<BaseResponseModel> createProduct(ProductDto product) {
+    public void createProduct(ProductDto product) {
         // validate if product is already existed
         if(productRepository.existsByProductName(product.getName())) {
             throw new DuplicateResourceException("product is already existed");
@@ -47,12 +46,9 @@ public class ProductService {
         Product productEntity = mapper.toEntity(product);
         
         productRepository.save(productEntity);
-        
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new BaseResponseModel("success","successfully created product"));
     }
     
-    public ResponseEntity<BaseResponseModel> updateProduct(Long productId,ProductDto product) {
+    public void updateProduct(Long productId,ProductDto product) {
         Product existing = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("product not found with id : " + productId));
         
@@ -61,30 +57,23 @@ public class ProductService {
         existing.setPrice(product.getPrice());
         
         productRepository.save(existing);
-        
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseModel("success","successfully updated product"));
     }
     
-    public ResponseEntity<BaseResponseModel> deleteProduct(Long productId) {
+    public void deleteProduct(Long productId) {
         if(!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException("product not found with id : " + productId);
         }
         
         productRepository.deleteById(productId);
-        
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseModel("success","successfully deleted product id: " + productId));
     }
     
-    public ResponseEntity<BaseResponseWithDataModel> searchProducts(String name, Double minPrice, Double maxPrice) {
+    public List<ProductResponseDto> searchProducts(String name, Double minPrice, Double maxPrice) {
         String formattedName = name != null ?
                 name.toLowerCase()
                 : null;
         
-        List<Product> product = productRepository.findProductsWithFilters(formattedName,minPrice,maxPrice);
+        List<Product> products = productRepository.findProductsWithFilters(formattedName,minPrice,maxPrice);
         
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new BaseResponseWithDataModel("success","successfully retrieved products with filters",product));
+        return mapper.toDtoList(products);
     }
 }
