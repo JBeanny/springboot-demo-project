@@ -1,14 +1,19 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.stock.StockDto;
+import com.beanny.demo.dto.stock.StockResponseDto;
 import com.beanny.demo.model.BaseResponseModel;
 import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.stock.UpdateStockDto;
 import com.beanny.demo.service.StockService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stocks")
@@ -17,27 +22,42 @@ public class StockController {
     private StockService stockService;
     
     @GetMapping
-    public ResponseEntity<BaseResponseWithDataModel> listStocks() {
-        return stockService.listStocks();
+    public ResponseEntity<Response> listStocks() {
+        List<StockResponseDto> stocks = stockService.listStocks();
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully retrieved stocks",stocks));
     }
     
     @GetMapping("{id}")
-    public ResponseEntity<BaseResponseWithDataModel> getStock(@PathVariable("id") Long stockId) {
-        return stockService.getStock(stockId);
+    public ResponseEntity<Response> getStock(@PathVariable("id") Long stockId) {
+        StockResponseDto stock = stockService.getStock(stockId);
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success("200","success","stock found",stock));
     }
     
     @PostMapping
-    public ResponseEntity<BaseResponseModel> createStock(@Valid @RequestBody StockDto payload) {
-        return stockService.createStock(payload);
+    public ResponseEntity<Response> createStock(@Valid @RequestBody StockDto payload) {
+        stockService.createStock(payload);
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Response.success("201","success","successfully created stock"));
     }
     
     @PatchMapping("{id}")
-    public ResponseEntity<BaseResponseModel> adjustQuantity(@PathVariable("id") Long stockId,@Valid @RequestBody UpdateStockDto payload) {
-        return stockService.adjustQuantity(stockId,payload);
+    public ResponseEntity<Response> adjustQuantity(@PathVariable("id") Long stockId,@Valid @RequestBody UpdateStockDto payload) {
+        stockService.adjustQuantity(stockId,payload);
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully adjusted stock quantity"));
     }
     
     @DeleteMapping("{id}")
-    public ResponseEntity<BaseResponseModel> deleteStock(@PathVariable("id") Long stockId) {
-        return stockService.deleteStock(stockId);
+    public ResponseEntity<Response> deleteStock(@PathVariable("id") Long stockId) {
+        stockService.deleteStock(stockId);
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully deleted stock"));
     }
 }
