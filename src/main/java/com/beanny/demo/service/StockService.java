@@ -7,18 +7,13 @@ import com.beanny.demo.entity.Stock;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.exception.model.UnprocessableEntityException;
 import com.beanny.demo.mapper.StockMapper;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.stock.UpdateStockDto;
 import com.beanny.demo.repository.ProductRepository;
 import com.beanny.demo.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StockService {
