@@ -27,8 +27,10 @@ public class LoggingAspect {
         String target = joinPoint.getTarget().getClass().getSimpleName();
         long startTime = System.currentTimeMillis();
         String requestId = MDC.get(RequestConstant.REQUEST_ID);
+        String httpMethod = MDC.get(RequestConstant.HTTP_METHOD);
+        String requestPath = MDC.get(RequestConstant.REQUEST_PATH);
         
-        log.info(formatter.logRequest(requestId,target,methodName,startTime));
+        log.info(formatter.logRequest(requestId,target,methodName,startTime,httpMethod,requestPath));
         
         try {
             // execute the original method logic
@@ -36,13 +38,13 @@ public class LoggingAspect {
             
             long endTime = System.currentTimeMillis();
             // logging
-            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime));
+            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             return result;
         } catch (Exception e) {
             long endTime = System.currentTimeMillis();
             
-            log.error(formatter.logError(requestId,target,methodName,startTime,endTime));
+            log.error(formatter.logError(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             throw e;
         }
@@ -55,20 +57,22 @@ public class LoggingAspect {
         String target = joinPoint.getTarget().getClass().getSimpleName();
         long startTime = System.currentTimeMillis();
         String requestId = MDC.get(RequestConstant.REQUEST_ID);
+        String httpMethod = MDC.get(RequestConstant.HTTP_METHOD);
+        String requestPath = MDC.get(RequestConstant.REQUEST_PATH);
         
-        log.info(formatter.logRequest(requestId,target,methodName,startTime));
+        log.info(formatter.logRequest(requestId,target,methodName,startTime,httpMethod,requestPath));
         
         try {
             Object result = joinPoint.proceed();
             long endTime = System.currentTimeMillis();
             
-            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime));
+            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             return result;
         } catch (Exception e) {
             long endTime = System.currentTimeMillis();
             
-            log.error(formatter.logError(requestId,target,methodName,startTime,endTime));
+            log.error(formatter.logError(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             throw e;
         }
@@ -81,8 +85,10 @@ public class LoggingAspect {
         String target = joinPoint.getTarget().getClass().getSimpleName();
         long startTime = System.currentTimeMillis();
         String requestId = MDC.get(RequestConstant.REQUEST_ID);
+        String httpMethod = MDC.get(RequestConstant.HTTP_METHOD);
+        String requestPath = MDC.get(RequestConstant.REQUEST_PATH);
         
-        log.info(formatter.logRequest(requestId,target,methodName,startTime));
+        log.info(formatter.logRequest(requestId,target,methodName,startTime,httpMethod,requestPath));
         
         try {
             // execute the original method logic
@@ -90,13 +96,13 @@ public class LoggingAspect {
             
             long endTime = System.currentTimeMillis();
             // logging
-            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime));
+            log.info(formatter.logResponse(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             return result;
         } catch (Exception e) {
             long endTime = System.currentTimeMillis();
             
-            log.error(formatter.logError(requestId,target,methodName,startTime,endTime));
+            log.error(formatter.logError(requestId,target,methodName,startTime,endTime,httpMethod,requestPath));
             
             throw e;
         }
