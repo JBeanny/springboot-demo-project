@@ -4,11 +4,9 @@ import com.beanny.demo.dto.user.ChangePasswordUserDto;
 import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.dto.user.UserResponseDto;
 import com.beanny.demo.entity.User;
-import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.exception.model.UnprocessableEntityException;
 import com.beanny.demo.mapper.UserMapper;
-import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.repository.UserRepository;
 import com.beanny.demo.service.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,27 +39,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("user not found with id : " + userId));
         
-        String token = jwtUtil.generateToken(user);
-        
-        System.out.println("Token: " + token);
-        
         return mapper.toDto(user);
-    }
-    
-    public void createUser(UserDto payload) {
-        // validate if username is existed
-        if(userRepository.existsByName(payload.getName())) {
-            throw new DuplicateResourceException("username is already existed");
-        }
-        
-        // validate if email is existed
-        if(userRepository.existsByEmail(payload.getEmail())) {
-            throw new DuplicateResourceException("email is already existed");
-        }
-        
-        User user = mapper.toEntity(payload);
-        
-        userRepository.save(user);
     }
     
     public void updateUser(UpdateUserDto payload, Long userId) {
