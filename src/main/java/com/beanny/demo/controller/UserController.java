@@ -37,17 +37,6 @@ public class UserController {
                 .body(Response.success("200","success","user found",user));
     }
     
-    // used for creating/inserting record
-    // request body can be called request payload or shortcut "payload"
-    @PostMapping
-    public ResponseEntity<Response> createUser(@Valid @RequestBody UserDto payload) {
-        userService.createUser(payload);
-        
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Response.success("201","success","successfully created user"));
-    }
-    
     //  endpoint -> /api/v1/users/923482348284
     @PutMapping("/{user_id}")
     public ResponseEntity<Response> updateUser(@PathVariable("user_id") Long userId,@Valid @RequestBody UpdateUserDto payload) {
