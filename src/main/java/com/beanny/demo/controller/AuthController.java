@@ -1,5 +1,7 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.auth.AuthDto;
+import com.beanny.demo.dto.auth.AuthResponseDto;
 import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.service.security.AuthService;
@@ -20,10 +22,19 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<Response> register(@Valid @RequestBody UserDto payload) {
-        String token = authService.register(payload);
+        AuthResponseDto dto = authService.register(payload);
         
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(Response.success("201","success",token));
+                .body(Response.success("201","success","successfully registered user",dto));
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<Response> login(@RequestBody AuthDto payload) {
+        AuthResponseDto dto = authService.login(payload);
+        
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully logged in",dto));
     }
 }
