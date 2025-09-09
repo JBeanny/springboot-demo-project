@@ -3,6 +3,7 @@ package com.beanny.demo.service.security;
 import com.beanny.demo.dto.auth.AuthDto;
 import com.beanny.demo.dto.auth.AuthResponseDto;
 import com.beanny.demo.dto.user.UserDto;
+import com.beanny.demo.entity.RefreshToken;
 import com.beanny.demo.entity.User;
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.mapper.UserMapper;
@@ -35,6 +36,9 @@ public class AuthService {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+    
     public AuthResponseDto register(UserDto payload) {
         // validate if username is existed
         if(userRepository.existsByName(payload.getName())) {
@@ -52,7 +56,10 @@ public class AuthService {
         User createdUser = userRepository.save(user);
         String accessToken = jwtUtil.generateToken(createdUser);
         
-        return new AuthResponseDto(accessToken,null);
+        // generate refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(createdUser);
+        
+        return new AuthResponseDto(accessToken,refreshToken.getToken());
     }
     
     public AuthResponseDto login(AuthDto payload) {
@@ -63,6 +70,10 @@ public class AuthService {
         UserDetails userDetails = userService.loadUserByUsername(payload.getUsername());
         String accessToken = jwtUtil.generateToken(userDetails);
         
-        return new AuthResponseDto(accessToken,null);
+        // generate refresh token
+        User user = (User) userDetails;
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        
+        return new AuthResponseDto(accessToken,refreshToken.getToken());
     }
 }
