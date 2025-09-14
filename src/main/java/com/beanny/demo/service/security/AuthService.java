@@ -2,6 +2,8 @@ package com.beanny.demo.service.security;
 
 import com.beanny.demo.dto.auth.AuthDto;
 import com.beanny.demo.dto.auth.AuthResponseDto;
+import com.beanny.demo.dto.auth.RefreshTokenDto;
+import com.beanny.demo.dto.auth.RefreshTokenResponseDto;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.entity.RefreshToken;
 import com.beanny.demo.entity.User;
@@ -12,9 +14,13 @@ import com.beanny.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.naming.AuthenticationException;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -75,5 +81,29 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         
         return new AuthResponseDto(accessToken,refreshToken.getToken());
+    }
+    
+    public RefreshTokenResponseDto refreshToken(RefreshTokenDto payload) {
+        String token = payload.getRefreshToken();
+        
+        // find by token
+        RefreshToken refreshToken = refreshTokenService.findByToken(token);
+        try {
+            refreshToken = refreshTokenService.verifyToken(refreshToken);
+            
+        } catch (AuthenticationException e) {
+            return null;
+        }
+        
+        // get user from refresh token
+        User user = refreshToken.getUser();
+        
+        // generate new access token
+        String newAccessToken = jwtUtil.generateToken(user);
+        
+        // rotate refresh token
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken);
+        
+        return new RefreshTokenResponseDto(newAccessToken,newRefreshToken.getToken(),"Bearer");
     }
 }

@@ -2,6 +2,8 @@ package com.beanny.demo.controller;
 
 import com.beanny.demo.dto.auth.AuthDto;
 import com.beanny.demo.dto.auth.AuthResponseDto;
+import com.beanny.demo.dto.auth.RefreshTokenDto;
+import com.beanny.demo.dto.auth.RefreshTokenResponseDto;
 import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.service.security.AuthService;
@@ -36,5 +38,14 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Response.success("200","success","successfully logged in",dto));
+    }
+    
+    @PostMapping("/refresh")
+    public ResponseEntity<Response> refresh(@Valid @RequestBody RefreshTokenDto payload) {
+        RefreshTokenResponseDto dto = authService.refreshToken(payload);
+        
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully refreshed token",dto));
     }
 }
