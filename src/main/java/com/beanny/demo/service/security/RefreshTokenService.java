@@ -5,24 +5,28 @@ import com.beanny.demo.entity.User;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Base64;
 
 @Service
 public class RefreshTokenService {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
     
+    @Value("${config.security.refresh-token-expiration}")
+    private Long expiration;
+    
     public RefreshToken createRefreshToken(User user) {
-        // TODO: generate as Base64 URL Encoder
-        String refreshToken = UUID.randomUUID().toString();
+        String refreshToken = this.generateSecureRefreshToken();
         
         RefreshToken entity = new RefreshToken();
         entity.setToken(refreshToken);
-        entity.setExpiresAt(LocalDateTime.now().plusHours(3));
+        entity.setExpiresAt(LocalDateTime.now().plusHours(this.expiration));
         entity.setUser(user);
         
         return refreshTokenRepository.save(entity);
@@ -50,5 +54,21 @@ public class RefreshTokenService {
         
         // generate new refresh token
         return this.createRefreshToken(oldToken.getUser());
+    }
+    
+    private String generateSecureRefreshToken() {
+        // -128 to 127
+        SecureRandom random = new SecureRandom();
+        
+        // array bytes of 64 length , 512 bits
+        byte[] tokenBytes = new byte[64];
+        
+        // make each byte has its own secure value
+        // [67,-125,100,12,....]
+        random.nextBytes(tokenBytes);
+        
+        // "hwdj1e0slasf3f3/+asjdfasjd/+" not URL friendly
+        // "hashfafej_-asdfkjake" URL friendly
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 }
