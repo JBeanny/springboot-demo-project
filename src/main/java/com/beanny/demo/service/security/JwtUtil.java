@@ -1,10 +1,12 @@
 package com.beanny.demo.service.security;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +18,17 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    @Value("${config.security.secret}")
-    private String secret; // ThisIsMySecret
+    @Autowired
+    private ApplicationConfiguration appConfig;
     
-    @Value("${config.security.expiration}")
-    private long expiration; // 3600000ms
+    private String secret;
+    private long expiration;
+    
+    @PostConstruct
+    private void init() {
+        this.secret = appConfig.getSecurity().getSecret();
+        this.expiration = appConfig.getSecurity().getExpiration();
+    }
     
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(this.secret.getBytes());

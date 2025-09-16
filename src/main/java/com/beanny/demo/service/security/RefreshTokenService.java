@@ -1,11 +1,12 @@
 package com.beanny.demo.service.security;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
 import com.beanny.demo.entity.RefreshToken;
 import com.beanny.demo.entity.User;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.repository.RefreshTokenRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
@@ -18,15 +19,22 @@ public class RefreshTokenService {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
     
-    @Value("${config.security.refresh-token-expiration}")
-    private Long expiration;
+    @Autowired
+    private ApplicationConfiguration appConfig;
+    
+    private long expiration;
+    
+    @PostConstruct
+    private void init() {
+        this.expiration = appConfig.getSecurity().getRefreshTokenExpiration();
+    }
     
     public RefreshToken createRefreshToken(User user) {
         String refreshToken = this.generateSecureRefreshToken();
         
         RefreshToken entity = new RefreshToken();
         entity.setToken(refreshToken);
-        entity.setExpiresAt(LocalDateTime.now().plusHours(this.expiration));
+        entity.setExpiresAt(LocalDateTime.now().plusHours(expiration));
         entity.setUser(user);
         
         return refreshTokenRepository.save(entity);
