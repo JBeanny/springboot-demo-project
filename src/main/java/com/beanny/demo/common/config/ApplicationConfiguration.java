@@ -13,6 +13,7 @@ public class ApplicationConfiguration {
     private Security security;
     
     @Getter
+    @Setter
     public static class Security {
         private String secret;
         private long expiration;
