@@ -1,5 +1,6 @@
 package com.beanny.demo.exception;
 
+import com.beanny.demo.exception.model.CustomAuthenticationException;
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.exception.model.UnprocessableEntityException;
@@ -33,6 +34,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnprocessableEntityException.class)
     public ResponseEntity<BaseResponseModel> handleUnprocessableEntity(UnprocessableEntityException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(new BaseResponseModel("fail", ex.getMessage()));
+    }
+    
+    @ExceptionHandler(CustomAuthenticationException.class)
+    public ResponseEntity<BaseResponseModel> handleAuthenticationException(CustomAuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new BaseResponseModel("fail", ex.getMessage()));
     }
     

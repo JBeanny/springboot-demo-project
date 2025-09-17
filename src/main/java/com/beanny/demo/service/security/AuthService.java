@@ -7,20 +7,20 @@ import com.beanny.demo.dto.auth.RefreshTokenResponseDto;
 import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.entity.RefreshToken;
 import com.beanny.demo.entity.User;
+import com.beanny.demo.exception.model.CustomAuthenticationException;
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.mapper.UserMapper;
 import com.beanny.demo.repository.UserRepository;
 import com.beanny.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -69,9 +69,14 @@ public class AuthService {
     }
     
     public AuthResponseDto login(AuthDto payload) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(payload.getUsername(),payload.getPassword())
-        );
+        try {
+            // login user
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(payload.getUsername(),payload.getPassword())
+            );
+        } catch (BadCredentialsException e) {
+            throw new CustomAuthenticationException("invalid username or password");
+        }
         
         UserDetails userDetails = userService.loadUserByUsername(payload.getUsername());
         String accessToken = jwtUtil.generateToken(userDetails);
@@ -92,7 +97,7 @@ public class AuthService {
             refreshToken = refreshTokenService.verifyToken(refreshToken);
             
         } catch (AuthenticationException e) {
-            return null;
+            throw new CustomAuthenticationException("invalid refresh token");
         }
         
         // get user from refresh token
