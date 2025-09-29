@@ -4,8 +4,6 @@ import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.dto.product.ProductResponseDto;
 import com.beanny.demo.entity.Product;
 import com.beanny.demo.mapper.ProductMapper;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.repository.ProductRepository;

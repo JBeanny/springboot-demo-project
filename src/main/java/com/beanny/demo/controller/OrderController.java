@@ -4,8 +4,6 @@ import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.order.OrderDto;
 import com.beanny.demo.dto.order.OrderResponseDto;
 import com.beanny.demo.dto.order.OrderUpdateDto;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

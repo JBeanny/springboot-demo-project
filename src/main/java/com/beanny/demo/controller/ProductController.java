@@ -3,8 +3,6 @@ package com.beanny.demo.controller;
 import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.dto.product.ProductResponseDto;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

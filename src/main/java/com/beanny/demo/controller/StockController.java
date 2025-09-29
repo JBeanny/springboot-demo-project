@@ -3,8 +3,6 @@ package com.beanny.demo.controller;
 import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.stock.StockDto;
 import com.beanny.demo.dto.stock.StockResponseDto;
-import com.beanny.demo.model.BaseResponseModel;
-import com.beanny.demo.model.BaseResponseWithDataModel;
 import com.beanny.demo.dto.stock.UpdateStockDto;
 import com.beanny.demo.service.StockService;
 import jakarta.validation.Valid;
