@@ -10,7 +10,7 @@ public class RefreshTokenCleanupSchedule {
     @Autowired
     private RefreshTokenService refreshTokenService;
     
-    @Scheduled(cron = "* * 0/3 * * ?") // every 3 hours from hour 00:00
+    @Scheduled(cron = "0 0 0/3 * * ?") // every 3 hours from hour 00:00
     public void cleanupExpiredAndRevokedToken() {
         // execute to clean up tokens
         refreshTokenService.deleteExpiredAndRevokedToken();
