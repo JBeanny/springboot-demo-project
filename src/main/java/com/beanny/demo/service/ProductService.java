@@ -1,5 +1,6 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.product.ProductDto;
 import com.beanny.demo.dto.product.ProductResponseDto;
 import com.beanny.demo.entity.Product;
@@ -8,8 +9,8 @@ import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,13 @@ public class ProductService {
     
     @Autowired
     private ProductMapper mapper;
+    
+    public PaginatedResponse listProductsWithPagination(Pageable pageable) {
+        Page<Product> productPages = productRepository.findAll(pageable);
+        Page<ProductResponseDto> productPagesDto = productPages.map(product -> mapper.toDto(product));
+        
+        return PaginatedResponse.from(productPagesDto);
+    }
     
     public List<ProductResponseDto> listProducts() {
         List<Product> products = productRepository.findAll();
