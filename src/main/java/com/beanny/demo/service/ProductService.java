@@ -27,7 +27,7 @@ public class ProductService {
         Page<Product> productPages = productRepository.findAll(pageable);
         Page<ProductResponseDto> productPagesDto = productPages.map(product -> mapper.toDto(product));
         
-        return PaginatedResponse.from(productPagesDto);
+        return PaginatedResponse.from(productPagesDto,"http://localhost:8080/api/v1/products/paginated");
     }
     
     public List<ProductResponseDto> listProducts() {
