@@ -8,6 +8,7 @@ import com.beanny.demo.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ProductController {
     
     @GetMapping("/paginated")
     public ResponseEntity<Response> listProductsWithPagination(
-            @PageableDefault(size = 10, page = 0) Pageable pageable
+            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         PaginatedResponse<ProductResponseDto> products  = productService.listProductsWithPagination(pageable);
         
