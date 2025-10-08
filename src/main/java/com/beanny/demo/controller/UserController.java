@@ -1,13 +1,16 @@
 package com.beanny.demo.controller;
 
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.base.Response;
 import com.beanny.demo.dto.user.ChangePasswordUserDto;
 import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.dto.user.UserResponseDto;
-import com.beanny.demo.dto.user.UserDto;
 import com.beanny.demo.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,16 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Response> listUsersWithPagination(
+            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        PaginatedResponse<UserResponseDto> users  = userService.listUsersWithPagination(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Response.success("200","success","successfully retrieved users with pagination",users));
+    }
     
     // used for retrieving records
     @GetMapping

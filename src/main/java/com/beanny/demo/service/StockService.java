@@ -1,5 +1,7 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.stock.StockDto;
 import com.beanny.demo.dto.stock.StockResponseDto;
 import com.beanny.demo.entity.Product;
@@ -11,6 +13,8 @@ import com.beanny.demo.dto.stock.UpdateStockDto;
 import com.beanny.demo.repository.ProductRepository;
 import com.beanny.demo.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,16 @@ public class StockService {
     
     @Autowired
     private StockMapper mapper;
+
+    @Autowired
+    private ApplicationConfiguration appConfig;
+
+    public PaginatedResponse listStocksWithPagination(Pageable pageable) {
+        Page<Stock> stockPages = stockRepository.findAll(pageable);
+        Page<StockResponseDto> stockPagesDto = stockPages.map(stock -> mapper.toDto(stock));
+
+        return PaginatedResponse.from(stockPagesDto,appConfig.getPagination().getUrlByResource("stock"));
+    }
     
     public List<StockResponseDto> listStocks() {
         List<Stock> stocks = stockRepository.findAll();

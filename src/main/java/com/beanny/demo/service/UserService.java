@@ -1,5 +1,7 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.user.ChangePasswordUserDto;
 import com.beanny.demo.dto.user.UpdateUserDto;
 import com.beanny.demo.dto.user.UserResponseDto;
@@ -10,6 +12,8 @@ import com.beanny.demo.mapper.UserMapper;
 import com.beanny.demo.repository.UserRepository;
 import com.beanny.demo.service.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +32,16 @@ public class UserService implements UserDetailsService {
     
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private ApplicationConfiguration appConfig;
+
+    public PaginatedResponse listUsersWithPagination(Pageable pageable) {
+        Page<User> userPages = userRepository.findAll(pageable);
+        Page<UserResponseDto> userPagesDto = userPages.map(user -> mapper.toDto(user));
+
+        return PaginatedResponse.from(userPagesDto,appConfig.getPagination().getUrlByResource("user"));
+    }
     
     public List<UserResponseDto> listUsers() {
         List<User> users = userRepository.findAll();

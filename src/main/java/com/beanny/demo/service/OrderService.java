@@ -1,5 +1,7 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.order.OrderDto;
 import com.beanny.demo.dto.order.OrderResponseDto;
 import com.beanny.demo.dto.order.OrderUpdateDto;
@@ -10,6 +12,8 @@ import com.beanny.demo.repository.OrderRepository;
 import com.beanny.demo.repository.StockRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +31,16 @@ public class OrderService {
     
     @Autowired
     private StockManagementService stockManagementService;
+
+    @Autowired
+    private ApplicationConfiguration appConfig;
+
+    public PaginatedResponse listOrdersWithPagination(Pageable pageable) {
+        Page<Order> orderPages = orderRepository.findAll(pageable);
+        Page<OrderResponseDto> orderPagesDto = orderPages.map(order -> mapper.toResponseDto(order));
+
+        return PaginatedResponse.from(orderPagesDto,appConfig.getPagination().getUrlByResource("order"));
+    }
     
     public List<OrderResponseDto> listOrders() {
         List<Order> orders = orderRepository.findAll();
