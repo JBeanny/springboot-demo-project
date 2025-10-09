@@ -10,6 +10,9 @@ import com.beanny.demo.exception.model.DuplicateResourceException;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,12 +37,14 @@ public class ProductService {
         return PaginatedResponse.from(productPagesDto,appConfig.getPagination().getUrlByResource("product"));
     }
     
+    @Cacheable(value = "products", key = "'all'")
     public List<ProductResponseDto> listProducts() {
         List<Product> products = productRepository.findAll();
         
         return mapper.toDtoList(products);
     }
     
+    @Cacheable(value = "products", key = "#productId")
     public ProductResponseDto getProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("product not found with id : " + productId));
@@ -47,6 +52,7 @@ public class ProductService {
         return mapper.toDto(product);
     }
     
+    @CachePut(value = "products", key = "#product.getName()")
     public void createProduct(ProductDto product) {
         // validate if product is already existed
         if(productRepository.existsByProductName(product.getName())) {
@@ -58,6 +64,7 @@ public class ProductService {
         productRepository.save(productEntity);
     }
     
+    @CacheEvict(value = "products", key = "#productId")
     public void updateProduct(Long productId,ProductDto product) {
         Product existing = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("product not found with id : " + productId));
