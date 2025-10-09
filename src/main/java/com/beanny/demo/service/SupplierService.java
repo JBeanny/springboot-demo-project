@@ -1,5 +1,7 @@
 package com.beanny.demo.service;
 
+import com.beanny.demo.common.config.ApplicationConfiguration;
+import com.beanny.demo.dto.base.PaginatedResponse;
 import com.beanny.demo.dto.supplier.SupplierDto;
 import com.beanny.demo.dto.supplier.SupplierResponseDto;
 import com.beanny.demo.dto.supplier.UpdateSupplierDto;
@@ -9,6 +11,8 @@ import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.mapper.SupplierMapper;
 import com.beanny.demo.repository.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,16 @@ public class SupplierService {
     
     @Autowired
     private SupplierMapper mapper;
+
+    @Autowired
+    private ApplicationConfiguration appConfig;
+
+    public PaginatedResponse listSuppliersWithPagination(Pageable pageable) {
+        Page<Supplier> supplierPages = supplierRepository.findAll(pageable);
+        Page<SupplierResponseDto> supplierPagesDto = supplierPages.map(supplier -> mapper.toDto(supplier));
+
+        return PaginatedResponse.from(supplierPagesDto,appConfig.getPagination().getUrlByResource("supplier"));
+    }
     
     public List<SupplierResponseDto> listSuppliers() {
         List<Supplier> suppliers = supplierRepository.findAll();
