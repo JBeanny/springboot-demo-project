@@ -30,7 +30,7 @@ public class ProductService {
     @Autowired
     private ApplicationConfiguration appConfig;
     
-    @Cacheable(value = "products-paginated", key = "T(String).valueOf(#pageable.getPageNumber()).concat('-').concat(T(String).valueOf(#pageable.getPageSize()))")
+    @Cacheable(value = "products-paginated", key = "T(com.beanny.demo.common.util.CacheKeyGenerator).generatePaginatedKey('products', #pageable)")
     public PaginatedResponse listProductsWithPagination(Pageable pageable) {
         Page<Product> productPages = productRepository.findAll(pageable);
         Page<ProductResponseDto> productPagesDto = productPages.map(product -> mapper.toDto(product));
