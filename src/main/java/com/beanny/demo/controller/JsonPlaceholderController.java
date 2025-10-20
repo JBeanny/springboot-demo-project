@@ -1,7 +1,7 @@
 package com.beanny.demo.controller;
 
 import com.beanny.demo.dto.base.Response;
-import com.beanny.demo.service.TestService;
+import com.beanny.demo.service.JsonPlaceholderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,22 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/mock")
-public class TestController {
+public class JsonPlaceholderController {
     @Autowired
-    private TestService testService;
+    private JsonPlaceholderService jsonPlaceholderService;
     
     @GetMapping("/sync")
     public ResponseEntity<Object> testSyncApi() {
-        Object res = testService.testSyncApi();
-        
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(Response.success("200","success","success",res));
-    }
-    
-    @GetMapping("/async")
-    public ResponseEntity<Object> testAsyncApi() {
-        Object res = testService.testAsyncApi();
+        Object res = jsonPlaceholderService.testSyncApi();
         
         return ResponseEntity
                 .status(HttpStatus.OK)
