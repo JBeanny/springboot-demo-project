@@ -1,9 +1,13 @@
 package com.beanny.demo.service;
 
 import com.beanny.demo.common.wrapper.WebClientWrapper;
+import com.beanny.demo.dto.external.JsonPlaceholderCommentDto;
+import com.beanny.demo.dto.external.JsonPlaceholderPostDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -11,16 +15,18 @@ public class JsonPlaceholderService {
     @Autowired
     private WebClientWrapper webClientWrapper;
     
-    public Object testSyncApi() {
+    public List<JsonPlaceholderPostDto> getPosts() {
         String uri = "https://jsonplaceholder.typicode.com/posts";
         
-        log.info("TEST: Before API request");
+        List<JsonPlaceholderPostDto> response = (List<JsonPlaceholderPostDto>) webClientWrapper.getSync(uri, List.class);
         
-        Object response = webClientWrapper.getSync(uri);
+        return response;
+    }
+    
+    public List<JsonPlaceholderCommentDto> getComments() {
+        String uri = "https://jsonplaceholder.typicode.com/comments";
         
-        log.info("TEST: Getting response");
-        
-        log.info("TEST: After API request");
+        List<JsonPlaceholderCommentDto> response = (List<JsonPlaceholderCommentDto>) webClientWrapper.getSync(uri, List.class);
         
         return response;
     }
