@@ -46,4 +46,12 @@ public class JsonPlaceholderService {
         
         return response;
     }
+    
+    public JsonPlaceholderPostDto createPost(JsonPlaceholderPostDto payload) {
+        String url = BASE_URL.concat(POSTS_URI);
+        
+        JsonPlaceholderPostDto response = webClientWrapper.postSync(url, payload, JsonPlaceholderPostDto.class);
+        
+        return response;
+    }
 }

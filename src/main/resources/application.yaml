@@ -35,5 +35,5 @@ config:
   json-placeholder:
     base-url: https://jsonplaceholder.typicode.com
     uri:
-      posts: /get-all-posts
+      posts: /posts
       comments: /comments

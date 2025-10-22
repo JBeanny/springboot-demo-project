@@ -24,4 +24,17 @@ public class WebClientWrapper {
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
                 .block();
     }
+    
+    public <T> T postSync(String url, Object payload, Class<T> responseType) {
+        return webClient
+                .post()
+                .uri(url)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(payload)
+                .retrieve()
+                .bodyToMono(responseType)
+                .timeout(Duration.ofMillis(5000))
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
+                .block();
+    }
 }
