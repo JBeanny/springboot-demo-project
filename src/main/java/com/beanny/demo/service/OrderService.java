@@ -70,7 +70,7 @@ public class OrderService {
         log.info("[SYNC-ORDER] Order created successfully with Order: {} | Thread: {}",order.getId(), threadName);
         log.info("[SYNC-ORDER] Trigger send notification asynchronously for Order: {} | Thread: {}",order.getId(), threadName );
         
-        notificationService.sendOrderConfirmationNotification(order.getId(),"Your order has been completed");
+        notificationService.sendOrderConfirmationNotification(order);
         
         log.info("[SYNC-ORDER-COMPLETED] Completed order and triggered send notification");
     }
