@@ -1,21 +1,46 @@
 server:
-  port: 9000
+  port: ${PORT:8080}
 
 spring:
   application:
     name: demo
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydb_prod
-    username: admin
-    password: admin
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/mydb_prod}
+    username: ${DATABASE_USERNAME:admin}
+    password: ${DATABASE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:MyVerySecurePassword}
+    # configuration cache type
+    cache:
+      type: redis
 
 config:
   security:
-    secret: 388c81c79cada4abd82f6cd6a1b76de8eb0c156009f98137e4c41064430eabdd
-    expiration: 100000 # ms
-    refresh-token-expiration: 3 # hr
+    secret: ${JWT_SECRET:388c81c79cada4abd82f6cd6a1b76de8eb0c156009f98137e4c41064430eabdd}
+    expiration: ${JWT_EXPIRATION:3600000} # ms
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:3} # hr
+  pagination:
+    base-url: http://localhost:8080/api/v1
+    uri:
+      product: /products/paginated
+      stock: /stocks/paginated
+      supplier: /suppliers/paginated
+      user: /users/paginated
+      order: /orders/paginated
+  json-placeholder:
+    base-url: https://jsonplaceholder.typicode.com
+    uri:
+      posts: /posts
+      comments: /comments
+  telegram:
+    base-url: https://api.telegram.org/bot{TOKEN}/sendMessage
+    token: ${TELEGRAM_TOKEN:NO_TOKEN}
+    chat-id: ${TELEGRAM_CHAT_ID:-4856996045}
