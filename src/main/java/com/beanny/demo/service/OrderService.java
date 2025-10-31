@@ -6,10 +6,12 @@ import com.beanny.demo.dto.order.OrderDto;
 import com.beanny.demo.dto.order.OrderResponseDto;
 import com.beanny.demo.dto.order.OrderUpdateDto;
 import com.beanny.demo.entity.Order;
+import com.beanny.demo.event.model.OrderEvent;
 import com.beanny.demo.exception.model.ResourceNotFoundException;
 import com.beanny.demo.mapper.OrderMapper;
 import com.beanny.demo.repository.OrderRepository;
 import com.beanny.demo.repository.StockRepository;
+import com.beanny.demo.service.kafka.ProducerService;
 import com.beanny.demo.service.mail.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +42,9 @@ public class OrderService {
     
     @Autowired
     private NotificationService notificationService;
+    
+    @Autowired
+    private ProducerService<OrderEvent> producerService;
 
     public PaginatedResponse listOrdersWithPagination(Pageable pageable) {
         Page<Order> orderPages = orderRepository.findAll(pageable);
@@ -66,6 +71,8 @@ public class OrderService {
         Order order = mapper.toEntity(payload);
 
         orderRepository.save(order);
+        
+        producerService.sendMessage("order.event", new OrderEvent(order.getId()));
         
         log.info("[SYNC-ORDER] Order created successfully with Order: {} | Thread: {}",order.getId(), threadName);
         log.info("[SYNC-ORDER] Trigger send notification asynchronously for Order: {} | Thread: {}",order.getId(), threadName );
